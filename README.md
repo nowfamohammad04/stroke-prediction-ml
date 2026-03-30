@@ -1,34 +1,48 @@
-# Stroke Prediction with Lifestyle Factors using Machine Learning
+# 🧠 Stroke Risk Prediction Dashboard
 
-## Project Overview
+🚀 **Live App:** https://stroke-prediction-ai.streamlit.app/
 
-This project aims to predict the risk of stroke using machine learning techniques based on lifestyle and health-related factors. Stroke is one of the leading causes of death and disability worldwide, and early prediction can help in taking preventive measures.
+---
 
-The system analyzes patient attributes such as age, BMI, hypertension, heart disease, glucose level, and smoking habits to estimate the probability of stroke occurrence.
+## 📌 Project Overview
 
-## Features
+This project predicts the probability of stroke using Machine Learning based on key health and lifestyle factors.
+
+Stroke is one of the leading causes of death and disability worldwide. Early prediction helps in taking preventive measures and improving healthcare outcomes.
+
+The system analyzes patient data such as age, BMI, glucose level, hypertension, heart disease, and smoking habits to estimate stroke risk.
+
+---
+
+## ✨ Key Features
 
 * Data preprocessing and cleaning
 * Handling missing values
 * Encoding categorical variables
 * Machine learning model training
-* Stroke risk prediction
-* Data analysis using Python libraries
+* Real-time stroke risk prediction
+* Interactive dashboard using Streamlit
+* Risk visualization (charts & progress bar)
+* Personalized health recommendations
 
-## Technologies Used
+---
+
+## 🛠️ Technologies Used
 
 * Python
 * Pandas
 * NumPy
 * Scikit-learn
 * Matplotlib
-* Streamlit (for UI)
+* Streamlit
 
-## Dataset
+---
+
+## 📊 Dataset
 
 The project uses a healthcare stroke prediction dataset containing patient health and lifestyle information.
 
-Main features in the dataset include:
+### Main Features:
 
 * Age
 * Gender
@@ -40,7 +54,9 @@ Main features in the dataset include:
 * Residence type
 * Work type
 
-## Machine Learning Workflow
+---
+
+## ⚙️ Machine Learning Workflow
 
 1. Load dataset
 2. Data preprocessing
@@ -50,6 +66,20 @@ Main features in the dataset include:
 6. Train machine learning model
 7. Predict stroke risk
 
-## Goal
+---
 
-The goal of this project is to develop a machine learning model that can assist in identifying individuals at risk of stroke based on lifestyle and health indicators, enabling early intervention and preventive healthcare.
+## 🌐 Deployment
+
+The application is deployed using Streamlit Community Cloud and is accessible via the live link above.
+
+---
+
+## 🎯 Goal
+
+The goal of this project is to build a machine learning system that can identify individuals at risk of stroke using health and lifestyle data, enabling early intervention and preventive healthcare.
+
+---
+
+## 📌 Conclusion
+
+This project demonstrates a complete end-to-end machine learning pipeline — from data preprocessing to model deployment — with a user-friendly dashboard for real-time prediction.
