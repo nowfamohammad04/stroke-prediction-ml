@@ -3,7 +3,7 @@ import joblib
 import pandas as pd
 import matplotlib.pyplot as plt
 
-# Load model files
+# -------- LOAD --------
 model = joblib.load("models/stroke_model.pkl")
 features = joblib.load("models/features.pkl")
 scaler = joblib.load("models/scaler.pkl")
@@ -29,19 +29,24 @@ Residence_type = st.selectbox("Residence Type", ["Urban", "Rural"])
 smoking_status = st.selectbox("Smoking Status", ["formerly smoked", "never smoked", "smokes"])
 
 # -------- BUTTON --------
-if st.button("🚀 Predict Stroke Risk"):
+predict = st.button("🚀 Predict Stroke Risk")
 
-    # Initialize all features = 0
+# -------- SAFE DEFAULT --------
+risk_prob = None  # prevents NameError ALWAYS
+
+# -------- PREDICTION --------
+if predict:
+
     input_dict = {col: 0 for col in features}
 
-    # Fill numeric values
+    # numeric
     input_dict["age"] = age
     input_dict["hypertension"] = hypertension
     input_dict["heart_disease"] = heart_disease
     input_dict["avg_glucose_level"] = glucose
     input_dict["bmi"] = bmi
 
-    # One-hot encoding safely
+    # categorical (safe)
     if f"gender_{gender}" in features:
         input_dict[f"gender_{gender}"] = 1
 
@@ -57,23 +62,19 @@ if st.button("🚀 Predict Stroke Risk"):
     if f"smoking_status_{smoking_status}" in features:
         input_dict[f"smoking_status_{smoking_status}"] = 1
 
-    # Convert to DataFrame
     input_df = pd.DataFrame([input_dict])
-
-    # Align with training features (IMPORTANT)
     input_df = input_df.reindex(columns=features, fill_value=0)
 
-    # Scale input
     input_scaled = scaler.transform(input_df)
 
-    # Predict
     probability = model.predict_proba(input_scaled)
-    risk_prob = probability[0][1] * 100
+    risk_prob = float(probability[0][1] * 100)
 
-    # -------- RESULT --------
+# -------- OUTPUT (SAFE) --------
+if risk_prob is not None:
+
     st.subheader(f"📊 Stroke Risk: {risk_prob:.2f}%")
 
-    # Chart
     fig, ax = plt.subplots()
     ax.pie([100 - risk_prob, risk_prob],
            labels=["Safe", "Risk"],
@@ -83,44 +84,29 @@ if st.button("🚀 Predict Stroke Risk"):
     # -------- FEEDBACK --------
     if risk_prob < 30:
         st.success("🟢 Low Stroke Risk")
-
-        st.write("### 🟢 Interpretation")
-        st.write("Your health condition indicates a low risk of stroke.")
-
         st.write("### 💡 Recommendations")
         st.write("""
         - Maintain a balanced diet  
         - Exercise regularly  
         - Avoid smoking  
-        - Regular health checkups  
         """)
 
     elif risk_prob < 60:
         st.warning("🟡 Moderate Stroke Risk")
-
-        st.write("### 🟡 Interpretation")
-        st.write("Some risk factors are present. Lifestyle improvements are recommended.")
-
         st.write("### 💡 Recommendations")
         st.write("""
-        - Reduce sugar and salt intake  
-        - Increase physical activity  
-        - Monitor blood pressure  
-        - Maintain BMI  
+        - Reduce sugar and salt  
+        - Monitor BP  
+        - Stay active  
         """)
 
     else:
         st.error("🔴 High Stroke Risk")
-
-        st.write("### 🔴 Interpretation")
-        st.write("High risk detected. Immediate medical attention is advised.")
-
         st.write("### 💡 Recommendations")
         st.write("""
-        - Consult a doctor immediately  
-        - Control BP and glucose  
+        - Consult a doctor  
+        - Control BP & glucose  
         - Quit smoking  
-        - Regular monitoring  
         """)
 
 # -------- FOOTER --------
