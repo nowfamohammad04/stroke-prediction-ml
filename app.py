@@ -3,7 +3,7 @@ import joblib
 import pandas as pd
 import matplotlib.pyplot as plt
 
-# Load model
+# Load model files
 model = joblib.load("models/stroke_model.pkl")
 features = joblib.load("models/features.pkl")
 scaler = joblib.load("models/scaler.pkl")
@@ -28,13 +28,10 @@ work_type = st.selectbox("Work Type", ["Private", "Self-employed", "Govt_job", "
 Residence_type = st.selectbox("Residence Type", ["Urban", "Rural"])
 smoking_status = st.selectbox("Smoking Status", ["formerly smoked", "never smoked", "smokes"])
 
-# BUTTON
-predict = st.button("Predict Stroke Risk")
+# -------- BUTTON --------
+if st.button("🚀 Predict Stroke Risk"):
 
-# -------- PREDICTION --------
-if predict:
-
-    # Initialize all features
+    # Initialize all features = 0
     input_dict = {col: 0 for col in features}
 
     # Fill numeric values
@@ -44,7 +41,7 @@ if predict:
     input_dict["avg_glucose_level"] = glucose
     input_dict["bmi"] = bmi
 
-    # One-hot encoding
+    # One-hot encoding safely
     if f"gender_{gender}" in features:
         input_dict[f"gender_{gender}"] = 1
 
@@ -63,7 +60,7 @@ if predict:
     # Convert to DataFrame
     input_df = pd.DataFrame([input_dict])
 
-    # Align with features
+    # Align with training features (IMPORTANT)
     input_df = input_df.reindex(columns=features, fill_value=0)
 
     # Scale input
@@ -78,7 +75,7 @@ if predict:
 
     # Chart
     fig, ax = plt.subplots()
-    ax.pie([100-risk_prob, risk_prob],
+    ax.pie([100 - risk_prob, risk_prob],
            labels=["Safe", "Risk"],
            autopct='%1.1f%%')
     st.pyplot(fig)
@@ -126,5 +123,5 @@ if predict:
         - Regular monitoring  
         """)
 
-# Footer
+# -------- FOOTER --------
 st.info("⚠️ This is an AI-based prediction and not a medical diagnosis.")
