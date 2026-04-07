@@ -8,45 +8,75 @@ model = joblib.load("models/stroke_model.pkl")
 features = joblib.load("models/features.pkl")
 scaler = joblib.load("models/scaler.pkl")
 
+# -------- PAGE CONFIG --------
 st.set_page_config(page_title="Stroke Prediction", layout="centered")
 
-st.title("🧠 Stroke Prediction System")
-st.write("Enter your health details to predict stroke risk")
+# -------- CUSTOM CSS --------
+st.markdown("""
+<style>
+.main {
+    background-color: #0f172a;
+}
+.stButton>button {
+    background: linear-gradient(90deg, #6366f1, #8b5cf6);
+    color: white;
+    border-radius: 10px;
+    height: 3em;
+    width: 100%;
+}
+.stButton>button:hover {
+    background: linear-gradient(90deg, #4f46e5, #7c3aed);
+}
+.block-container {
+    padding-top: 2rem;
+}
+</style>
+""", unsafe_allow_html=True)
 
-# -------- INPUTS --------
-age = st.slider("Age", 1, 100, 25)
-gender = st.selectbox("Gender", ["Male", "Female"])
-ever_married = st.selectbox("Ever Married", ["Yes", "No"])
+# -------- HEADER --------
+st.markdown("<h1 style='text-align:center; color:#6366f1;'>🧠 Stroke Risk Predictor</h1>", unsafe_allow_html=True)
+st.markdown("<p style='text-align:center;'>AI-powered health risk analysis</p>", unsafe_allow_html=True)
+
+st.markdown("---")
+
+# -------- INPUT SECTION --------
+st.subheader("📝 Enter Your Details")
+
+col1, col2 = st.columns(2)
+
+with col1:
+    age = st.slider("Age", 1, 100, 25)
+    bmi = st.number_input("BMI", 10.0, 60.0, 25.0)
+    glucose = st.number_input("Glucose Level", 50.0, 300.0, 100.0)
+
+with col2:
+    gender = st.selectbox("Gender", ["Male", "Female"])
+    smoking_status = st.selectbox("Smoking Status", ["formerly smoked", "never smoked", "smokes"])
+    work_type = st.selectbox("Work Type", ["Private", "Self-employed", "Govt_job", "children"])
 
 hypertension = st.selectbox("Hypertension", [0, 1])
 heart_disease = st.selectbox("Heart Disease", [0, 1])
-
-glucose = st.number_input("Glucose Level", 50.0, 300.0, 100.0)
-bmi = st.number_input("BMI", 10.0, 60.0, 25.0)
-
-work_type = st.selectbox("Work Type", ["Private", "Self-employed", "Govt_job", "children"])
+ever_married = st.selectbox("Ever Married", ["Yes", "No"])
 Residence_type = st.selectbox("Residence Type", ["Urban", "Rural"])
-smoking_status = st.selectbox("Smoking Status", ["formerly smoked", "never smoked", "smokes"])
+
+st.markdown("---")
 
 # -------- BUTTON --------
 predict = st.button("🚀 Predict Stroke Risk")
 
-# -------- SAFE DEFAULT --------
-risk_prob = None  # prevents NameError ALWAYS
+risk_prob = None
 
 # -------- PREDICTION --------
 if predict:
 
     input_dict = {col: 0 for col in features}
 
-    # numeric
     input_dict["age"] = age
     input_dict["hypertension"] = hypertension
     input_dict["heart_disease"] = heart_disease
     input_dict["avg_glucose_level"] = glucose
     input_dict["bmi"] = bmi
 
-    # categorical (safe)
     if f"gender_{gender}" in features:
         input_dict[f"gender_{gender}"] = 1
 
@@ -70,44 +100,63 @@ if predict:
     probability = model.predict_proba(input_scaled)
     risk_prob = float(probability[0][1] * 100)
 
-# -------- OUTPUT (SAFE) --------
+# -------- OUTPUT --------
 if risk_prob is not None:
 
-    st.subheader(f"📊 Stroke Risk: {risk_prob:.2f}%")
+    st.markdown("---")
+    st.subheader("📊 Prediction Result")
 
+    st.metric(label="Stroke Risk", value=f"{risk_prob:.2f}%")
+
+    # progress bar
+    st.progress(int(risk_prob))
+
+    # chart
     fig, ax = plt.subplots()
     ax.pie([100 - risk_prob, risk_prob],
            labels=["Safe", "Risk"],
            autopct='%1.1f%%')
     st.pyplot(fig)
 
-    # -------- FEEDBACK --------
+    # risk level
     if risk_prob < 30:
-        st.success("🟢 Low Stroke Risk")
-        st.write("### 💡 Recommendations")
-        st.write("""
-        - Maintain a balanced diet  
-        - Exercise regularly  
-        - Avoid smoking  
-        """)
-
+        st.success("🟢 Low Risk")
     elif risk_prob < 60:
-        st.warning("🟡 Moderate Stroke Risk")
-        st.write("### 💡 Recommendations")
-        st.write("""
-        - Reduce sugar and salt  
-        - Monitor BP  
-        - Stay active  
-        """)
-
+        st.warning("🟡 Moderate Risk")
     else:
-        st.error("🔴 High Stroke Risk")
-        st.write("### 💡 Recommendations")
-        st.write("""
-        - Consult a doctor  
-        - Control BP & glucose  
-        - Quit smoking  
-        """)
+        st.error("🔴 High Risk")
+
+    # recommendations
+    st.markdown("### 💡 Personalized Recommendations")
+
+    recommendations = []
+
+    if bmi > 25:
+        recommendations.append("Maintain a healthy BMI")
+
+    if glucose > 140:
+        recommendations.append("Control blood sugar levels")
+
+    if hypertension == 1:
+        recommendations.append("Monitor blood pressure")
+
+    if heart_disease == 1:
+        recommendations.append("Regular cardiac checkups")
+
+    if smoking_status == "smokes":
+        recommendations.append("Quit smoking")
+    elif smoking_status == "formerly smoked":
+        recommendations.append("Continue avoiding smoking")
+
+    if age > 50:
+        recommendations.append("Regular health screening recommended")
+
+    if len(recommendations) == 0:
+        recommendations.append("Maintain your healthy lifestyle")
+
+    for rec in recommendations:
+        st.write(f"✔ {rec}")
 
 # -------- FOOTER --------
+st.markdown("---")
 st.info("⚠️ This is an AI-based prediction and not a medical diagnosis.")
