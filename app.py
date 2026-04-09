@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 # -------- LOAD --------
 model = joblib.load("models/stroke_model.pkl")
 features = joblib.load("models/features.pkl")
+features = list(features)
 scaler = joblib.load("models/scaler.pkl")
 
 # -------- PAGE CONFIG --------
@@ -57,7 +58,7 @@ with col2:
 hypertension = st.selectbox("Hypertension", [0, 1])
 heart_disease = st.selectbox("Heart Disease", [0, 1])
 ever_married = st.selectbox("Ever Married", ["Yes", "No"])
-Residence_type = st.selectbox("Residence Type", ["Urban", "Rural"])
+residence_type = st.selectbox("Residence Type", ["Urban", "Rural"])
 
 st.markdown("---")
 
@@ -68,9 +69,7 @@ risk_prob = None
 
 # -------- PREDICTION --------
 if predict:
-
     input_dict = {col: 0 for col in features}
-
     input_dict["age"] = age
     input_dict["hypertension"] = hypertension
     input_dict["heart_disease"] = heart_disease
@@ -85,9 +84,8 @@ if predict:
 
     if f"work_type_{work_type}" in features:
         input_dict[f"work_type_{work_type}"] = 1
-
-    if f"Residence_type_{Residence_type}" in features:
-        input_dict[f"Residence_type_{Residence_type}"] = 1
+if f"residence_type_{residence_type}" in features:
+    input_dict[f"residence_type_{residence_type}"] = 1
 
     if f"smoking_status_{smoking_status}" in features:
         input_dict[f"smoking_status_{smoking_status}"] = 1
