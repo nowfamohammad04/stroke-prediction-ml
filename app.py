@@ -117,9 +117,9 @@ if risk_prob is not None:
     st.pyplot(fig)
 
     # risk level
-    if risk_prob < 30:
+    if risk_prob < 35:
         st.success("🟢 Low Risk")
-    elif risk_prob < 60:
+    elif risk_prob < 80:
         st.warning("🟡 Moderate Risk")
     else:
         st.error("🔴 High Risk")
