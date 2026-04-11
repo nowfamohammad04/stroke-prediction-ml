@@ -69,34 +69,44 @@ risk_prob = None
 
 # -------- PREDICTION --------
 if predict:
-    input_dict = {col: 0 for col in features}
-    input_dict["age"] = age
-    input_dict["hypertension"] = hypertension
-    input_dict["heart_disease"] = heart_disease
-    input_dict["avg_glucose_level"] = glucose
-    input_dict["bmi"] = bmi
+    try:
+        input_dict = {col: 0 for col in features}
 
-    if f"gender_{gender}" in features:
-        input_dict[f"gender_{gender}"] = 1
+        input_dict["age"] = age
+        input_dict["hypertension"] = hypertension
+        input_dict["heart_disease"] = heart_disease
+        input_dict["avg_glucose_level"] = glucose
+        input_dict["bmi"] = bmi
 
-    if f"ever_married_{ever_married}" in features:
-        input_dict[f"ever_married_{ever_married}"] = 1
+        # One-hot encoding
+        if f"gender_{gender}" in features:
+            input_dict[f"gender_{gender}"] = 1
 
-    if f"work_type_{work_type}" in features:
-        input_dict[f"work_type_{work_type}"] = 1
-if f"residence_type_{residence_type}" in features:
-    input_dict[f"residence_type_{residence_type}"] = 1
+        if f"ever_married_{ever_married}" in features:
+            input_dict[f"ever_married_{ever_married}"] = 1
 
-    if f"smoking_status_{smoking_status}" in features:
-        input_dict[f"smoking_status_{smoking_status}"] = 1
+        if f"work_type_{work_type}" in features:
+            input_dict[f"work_type_{work_type}"] = 1
 
-    input_df = pd.DataFrame([input_dict])
-    input_df = input_df.reindex(columns=features, fill_value=0)
+        if f"Residence_type_{residence_type}" in features:
+            input_dict[f"Residence_type_{residence_type}"] = 1
 
-    input_scaled = scaler.transform(input_df)
+        if f"smoking_status_{smoking_status}" in features:
+            input_dict[f"smoking_status_{smoking_status}"] = 1
 
-    probability = model.predict_proba(input_scaled)
-    risk_prob = float(probability[0][1] * 100)
+        # DataFrame
+        input_df = pd.DataFrame([input_dict])
+        input_df = input_df.reindex(columns=features, fill_value=0)
+
+        # Scaling
+        input_scaled = scaler.transform(input_df.astype(float))
+
+        # Prediction
+        probability = model.predict_proba(input_scaled)
+        risk_prob = float(probability[0][1] * 100)
+
+    except Exception as e:
+        st.error(f"Error: {e}")
 
 # -------- OUTPUT --------
 if risk_prob is not None:
